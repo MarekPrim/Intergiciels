@@ -59,7 +59,10 @@ public class CarnetImpl extends UnicastRemoteObject implements Carnet {
 
     @Override
     public Individu[] getAll() throws RemoteException {
-    	Individu[] result = contenu.toArray(new Individu[0]);
+    	Individu[] result = new Individu[contenu.size()];
+        for(int i = 0; i < contenu.size(); i++){
+            result[i] = contenu.get(i);
+        }
         return result;
     }
 

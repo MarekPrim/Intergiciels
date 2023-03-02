@@ -8,8 +8,8 @@ public class IndividuImplRemote extends UnicastRemoteObject implements Individu 
 	private static final long serialVersionUID = 1L;
 
 	private Individu individu;
-    protected IndividuImplRemote(String nom, int age) throws RemoteException {
-        individu = new IndividuImpl(nom, age);
+    protected IndividuImplRemote(Individu i) throws RemoteException {
+        individu = i;
         System.out.println("Constructeur Ind remo");
     }
 
