@@ -1,0 +1,82 @@
+TP JMS
+======
+
+L'objectif est la gestion d'un Forum de discussion pouvant faire intervenir
+un nombre quelconque d'intervenants utilisant une application Irc. Chaque
+Irc peut émettre des messages qui sont diffusés à l'ensemble des Irc. Les
+messages ne sont pas mémorisés par le Forum. Seuls les Irc présents sur le
+Forum reçoivent les messages émis. Pour émettre, un Irc doit être connecté
+au Forum.
+
+Nous considérons  les opérations suivantes :  
+     Connect : permet à un Irc de se connecter au Forum.  
+     Leave : permet à un Irc de se déconnecter du Forum.  
+     Write : permet à un Irc d'émettre un message.  
+     Who : permet à un Irc de connaître l'ensemble des intervenants
+           connectés au Forum.
+
+Fichiers fournis
+----------------
+
+- CreateDestination.java contient une petite application qui crée :
+     - une ConnectionFactory et l'enregistre dans le serveur JNDI
+       sous le nom "ConnFactory" ;
+     - un Topic et l'enregistre dans le serveur JNDI sous le nom "MonTopic";
+- HelloWorld.java : un petit exemple complet pour débuter.
+- Irc.java inclut l'interface graphique de l'application, à compléter.
+
+À Faire
+-------
+
+1) Étudier et faire tourner HelloWorld, en lançant plusieurs instances
+   simultanément.
+2) Modifier CreateDestination pour créer une Queue au lieu d'un Topic, et
+   relancer avec plusieurs HelloWorld; observer la différence.
+3) Compléter Irc.java pour obtenir la diffusion et l'affichage d'un message
+   (opérations Connect et Write).
+4) Étudier et coder la réalisation de l'opération Who qui permet de savoir
+   qui est là.
+5) Ajouter un bouton "Private Write" pour permettre à un utilisateur d'écrire à un
+   autre sans que tous reçoivent le message.
+
+Compilation
+-----------
+    ant compile
+
+Exécution
+---------
+`ant single_server`      : permet de lancer un serveur Joram unique  
+`ant create_destination` : permet de lancer l'application qui crée la destination.
+                           À faire *une fois* après chaque lancement du serveur.  
+`ant hello`              : permet de lancer une instance de l'application Hello.  
+`ant irc1`               : permet de lancer l'application Irc avec le nom d'utilisateur user1.  
+`ant irc2`, `ant irc3`   : idem avec nom user2 ou user3.
+
+Eclipse
+-------
+
+Pour créer un projet sous eclipse, faire :  
+New > Project > Java Projet from Existing Ant Buildfile
+
+Pour importer le fichier ant sous IntelliJ, sélectionner le fichier
+"build.xml", bouton droit, "Add as ant build file".
+
+Architecture et doc JMS
+-----------------------
+
+Documentation disponible : <https://docs.oracle.com/javaee/7/api/index.html?javax/jms/package-summary.html>
+
+                    JNDI
+                     |
+                     v
+              ConnectionFactory
+                     |
+                     v
+                 Connection
+                     |
+                     v
+    Message <---- Session -----> Message
+    Producer         |           Consumer
+     |               v            |
+     send         Message         setMessageListener
+                StreamMessage

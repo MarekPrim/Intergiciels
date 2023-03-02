@@ -1,0 +1,71 @@
+package carnet;
+
+import java.rmi.server.UnicastRemoteObject;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.util.*;
+
+/** Implémentation basique d'un Carnet accessible à distance.
+ *  Utilise une List(e) pour ranger les Individu(s).
+ */
+public class CarnetImpl extends UnicastRemoteObject implements Carnet {
+    
+    private List<Individu> contenu = new ArrayList<Individu>();
+    private List<CallbackOnCreation> callbacks = new ArrayList<CallbackOnCreation>();
+
+    public CarnetImpl() throws RemoteException {}
+    
+    @Override
+    public void executeCallbacks(Individu i) throws RemoteException {
+    	for(CallbackOnCreation cb: this.callbacks) {
+    		cb.eventCreated(i);
+    		this.removeCallbackOnCreation(cb);
+    	}
+    }
+
+    @Override
+    public void inserer(Individu x) throws RemoteException {
+    	System.out.println("Insertion de "+x.nom());
+        contenu.add( x);
+    }
+
+    @Override
+    public Individu chercher(String nom) throws RemoteException, IndividuInexistant {
+        Individu result = null;
+        for(Individu i : contenu){
+           if(i.nom().equals(nom)){
+               result = i;
+           }
+       }
+         if(result == null){
+              throw new IndividuInexistant("Individu inexistant");
+         }
+        return  result;
+    }
+
+    @Override
+    public Individu get(int n) throws RemoteException, IndividuInexistant {
+        return contenu.get(n);
+    }
+
+    @Override
+    public Individu[] getAll() throws RemoteException {
+    	IndividuImpl[] result = new IndividuImpl[contenu.size()];
+        for(int i = 0; i < contenu.size(); i++){
+            result[i] = contenu.get(i);
+        }
+        return result;
+    }
+
+    @Override
+    public void addCallbackOnCreation(CallbackOnCreation cb) throws RemoteException {
+    	this.callbacks.add(cb);
+    }
+
+    @Override
+    public void removeCallbackOnCreation(CallbackOnCreation cb) throws RemoteException {
+    	this.callbacks.remove(cb);
+    }
+
+    
+}

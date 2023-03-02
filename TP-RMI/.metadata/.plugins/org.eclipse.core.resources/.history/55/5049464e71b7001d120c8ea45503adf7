@@ -1,0 +1,17 @@
+package carnet;
+
+import java.rmi.RemoteException;
+
+public class CallbackCreation implements CallbackOnCreation{
+
+	@Override
+	public void eventCreated(Individu i) throws RemoteException {
+		try {
+            System.out.println("Création: " + i.nom());
+        }
+        catch (Exception obj) {
+            System.err.println("eventCreated: exception: " + obj);
+        }
+	}
+
+}

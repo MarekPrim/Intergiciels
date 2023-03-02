@@ -1,0 +1,17 @@
+package carnet;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+/** Interface Individu. */
+public interface Individu extends Remote{
+    /** Renvoie le nom de l'individu. 
+     * @throws RemoteException */
+    String nom() throws RemoteException;
+
+    /** Renvoie l'age actuel de l'individu. */
+    int age();
+
+    /** Incrémente l'age actuel de l'individu et affiche à l'écran un message. */
+    void feter_anniversaire ();
+}

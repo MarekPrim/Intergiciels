@@ -1,0 +1,23 @@
+package carnet;
+
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class CallbackCreation  extends UnicastRemoteObject implements CallbackOnCreation{
+
+	protected CallbackCreation() throws RemoteException {
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+	public void eventCreated(Individu i) throws RemoteException {
+		try {
+            System.out.println("Création: " + i.nom());
+        }
+        catch (Exception obj) {
+            System.err.println("eventCreated Exception " + obj);
+        }
+	}
+
+}

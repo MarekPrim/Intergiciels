@@ -1,0 +1,33 @@
+package carnet;
+
+import java.rmi.RemoteException;
+import java.rmi.server.RemoteObject;
+import java.rmi.server.UnicastRemoteObject;
+
+public class IndividuImplRemote extends RemoteObject implements Individu {
+
+    protected IndividuImplRemote() throws RemoteException {
+		super();
+	}
+
+	private static final long serialVersionUID = 1L;
+
+	@Override
+    public String nom() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nom'");
+    }
+
+    @Override
+    public int age() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'age'");
+    }
+
+    @Override
+    public void feter_anniversaire() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'feter_anniversaire'");
+    }
+    
+}

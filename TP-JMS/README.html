@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+</head>
+<body>
+<h1 id="tp-jms">TP JMS</h1>
+<p>L’objectif est la gestion d’un Forum de discussion pouvant faire intervenir un nombre quelconque d’intervenants utilisant une application Irc. Chaque Irc peut émettre des messages qui sont diffusés à l’ensemble des Irc. Les messages ne sont pas mémorisés par le Forum. Seuls les Irc présents sur le Forum reçoivent les messages émis. Pour émettre, un Irc doit être connecté au Forum.</p>
+<p>Nous considérons les opérations suivantes :<br />
+Connect : permet à un Irc de se connecter au Forum.<br />
+Leave : permet à un Irc de se déconnecter du Forum.<br />
+Write : permet à un Irc d’émettre un message.<br />
+Who : permet à un Irc de connaître l’ensemble des intervenants connectés au Forum.</p>
+<h2 id="fichiers-fournis">Fichiers fournis</h2>
+<ul>
+<li>CreateDestination.java contient une petite application qui crée :
+<ul>
+<li>une ConnectionFactory et l’enregistre dans le serveur JNDI sous le nom “ConnFactory” ;</li>
+<li>un Topic et l’enregistre dans le serveur JNDI sous le nom “MonTopic”;</li>
+</ul></li>
+<li>HelloWorld.java : un petit exemple complet pour débuter.</li>
+<li>Irc.java inclut l’interface graphique de l’application, à compléter.</li>
+</ul>
+<h2 id="à-faire">À Faire</h2>
+<ol type="1">
+<li>Étudier et faire tourner HelloWorld, en lançant plusieurs instances simultanément.</li>
+<li>Modifier CreateDestination pour créer une Queue au lieu d’un Topic, et relancer avec plusieurs HelloWorld; observer la différence.</li>
+<li>Compléter Irc.java pour obtenir la diffusion et l’affichage d’un message (opérations Connect et Write).</li>
+<li>Étudier et coder la réalisation de l’opération Who qui permet de savoir qui est là.</li>
+<li>Ajouter un bouton “Private Write” pour permettre à un utilisateur d’écrire à un autre sans que tous reçoivent le message.</li>
+</ol>
+<h2 id="compilation">Compilation</h2>
+<pre><code>ant compile</code></pre>
+<h2 id="exécution">Exécution</h2>
+<p><code>ant single_server</code> : permet de lancer un serveur Joram unique<br />
+<code>ant create_destination</code> : permet de lancer l’application qui crée la destination. À faire <em>une fois</em> après chaque lancement du serveur.<br />
+<code>ant hello</code> : permet de lancer une instance de l’application Hello.<br />
+<code>ant irc1</code> : permet de lancer l’application Irc avec le nom d’utilisateur user1.<br />
+<code>ant irc2</code>, <code>ant irc3</code> : idem avec nom user2 ou user3.</p>
+<h2 id="eclipse">Eclipse</h2>
+<p>Pour créer un projet sous eclipse, faire :<br />
+New &gt; Project &gt; Java Projet from Existing Ant Buildfile</p>
+<p>Pour importer le fichier ant sous IntelliJ, sélectionner le fichier “build.xml”, bouton droit, “Add as ant build file”.</p>
+<h2 id="architecture-et-doc-jms">Architecture et doc JMS</h2>
+<p>Documentation disponible : <a href="https://docs.oracle.com/javaee/7/api/index.html?javax/jms/package-summary.html" class="uri">https://docs.oracle.com/javaee/7/api/index.html?javax/jms/package-summary.html</a></p>
+<pre><code>                JNDI
+                 |
+                 v
+          ConnectionFactory
+                 |
+                 v
+             Connection
+                 |
+                 v
+Message &lt;---- Session -----&gt; Message
+Producer         |           Consumer
+ |               v            |
+ send         Message         setMessageListener
+            StreamMessage</code></pre>
+</body>
+</html>

@@ -1,0 +1,23 @@
+package carnet;
+
+public class IndividuImplRemote extends UnicastRemoteObject implements Individu {
+
+    @Override
+    public String nom() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'nom'");
+    }
+
+    @Override
+    public int age() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'age'");
+    }
+
+    @Override
+    public void feter_anniversaire() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'feter_anniversaire'");
+    }
+    
+}

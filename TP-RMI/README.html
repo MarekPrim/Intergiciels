@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+</head>
+<body>
+<h1 id="tp-rmi">TP RMI</h1>
+<h2 id="objectifs">Objectifs</h2>
+<p>Le système est constitué d’un objet de type <code>Carnet</code>, dans lequel on range des Individus.</p>
+<p>Un Individu possède un nom et un âge. Le nom et l’âge sont fixés à la création, et l’âge augmente via la méthode <code>fêter_anniversaire</code>.</p>
+<p>Un <code>Carnet</code> stocke des Individus. On peut en outre chercher un individu par nom, par numéro d’ordre ou les obtenir tous.</p>
+<p>Version 1 : seul le Carnet est accessible à distance. Les Individus sont sérialisables (accès par valeur/copie). Commencer par écrire uniquement la partie cliente (<code>IndividuImpl.java</code> et <code>ClientTxt.java</code>) et tester avec le serveur founi dans le répertoire Solution. Puis compléter <code>CarnetImpl.java</code> et <code>ServeurCarnet.java</code>.</p>
+<p>Version 2 : le Carnet et les Individus sont accessibles à distance (accès par référence). Tester avec plusieurs clients.</p>
+<p>L’objectif du tp est de mettre en oeuvre ces deux versions et d’observer la différence, notamment en insérant des traces dans les méthodes.</p>
+<p>Version 3 : on ajoute un “callback” pour qu’un client puisse s’abonner et être informé quand un nouvel Individu est créé. Ce callback implante l’interface <code>CallbackOnCreation</code></p>
+<p>Version 4 : ayant observé que ni la version 1 ni la 2 ne sont satisfaisantes, réaliser une version où <code>inserer</code> prend un invidivu sérialisable et <code>chercher</code> (et consorts) renvoie un individu remote, situé sur le serveur du carnet.</p>
+<hr />
+<h2 id="sources-fournies">Sources fournies</h2>
+<p>Les sources fournies :</p>
+<ul>
+<li><p><code>Carnet.java</code> : l’interface d’un objet Carnet.</p></li>
+<li><p><code>CarnetImpl.java</code> : l’implantation d’un objet Carnet. INCOMPLET.</p></li>
+<li><p><code>IndividuInexistant.java</code> : exception levée par Carnet.</p></li>
+<li><p><code>Individu.java</code> : l’interface d’un objet Individu.</p></li>
+<li><p><code>ServeurCarnet.java</code> : pgm principal créant un objet carnet. INCOMPLET.</p></li>
+<li><p><code>ClientTxt.java</code> : client de l’objet carnet. INCOMPLET.</p></li>
+<li><p><code>CallbackOnCreation.java</code> : l’interface du callback de création.</p></li>
+<li><p><code>ClientGraph.java</code> : autre client graphique. Complet mais peu compréhensible en premier abord.</p></li>
+</ul>
+<p>Classes à écrire intégralement :</p>
+<ul>
+<li><code>IndividuImpl.java</code> : implantation d’un objet Individu.</li>
+</ul>
+<hr />
+<h2 id="solution">Solution</h2>
+<p>Dans le sous-répertoire Solution/carnet, vous trouverez (en version compilée) :</p>
+<ul>
+<li>ServeurCarnet</li>
+<li>ClientTxt<br />
+</li>
+<li>ClientGraph comme ClientTxt en plus joli.</li>
+<li>Peupleur crée plusieurs individus et les insère dans le carnet.</li>
+</ul>
+<p>Démarrage (depuis le répertoire contenant le répertoire <code>carnet</code>) :</p>
+<pre><code>java carnet.ServeurCarnet
+java carnet.ClientTxt [registryhost]
+java carnet.ClientGraph [registryhost]
+java carnet.Peupleur [registryhost]</code></pre>
+<hr />
+<h2 id="multi-machines">Multi-machines</h2>
+<p>Pour exécuter le code avec plusieurs machines : (https://docs.oracle.com/javase/7/docs/technotes/guides/rmi/faq.html#domain)</p>
+<p>java -Djava.rmi.server.hostname=vrainomdelamachine …<br />
+(nécessaire pour le serveur seulement – sinon l’objet a une référence par rapport à localhost, laquelle n’a aucun sens une fois récupérée sur une autre machine)</p>
+</body>
+</html>
