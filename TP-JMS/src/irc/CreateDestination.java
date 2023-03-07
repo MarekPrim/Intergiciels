@@ -19,6 +19,10 @@ public class CreateDestination {
     Destination destination = Topic.create(0);
     //Destination destination = Queue.create(0); // XXXX
 
+    Destination user1 = Topic.create(0);
+    Destination user2 = Topic.create(0);
+    Destination user3 = Topic.create(0);
+    
     // Creating an access for user anonymous:
     User.create("anonymous", "anonymous", 0);
 
@@ -26,10 +30,22 @@ public class CreateDestination {
     destination.setFreeReading();
     destination.setFreeWriting();
 
+    user1.setFreeReading();
+    user1.setFreeWriting();
+    user2.setFreeReading();
+    user2.setFreeWriting();
+    user3.setFreeReading();
+    user3.setFreeWriting();
+    
+    
+
     // Binding objects in JNDI:
     javax.naming.Context jndiCtx = new javax.naming.InitialContext();
     jndiCtx.bind("ConnFactory", connFactory);
     jndiCtx.bind("MonTopic", destination);
+    jndiCtx.bind("user1", user1);
+    jndiCtx.bind("user2", user2);
+    jndiCtx.bind("user3", user3);
     jndiCtx.close();
     
     AdminModule.disconnect();

@@ -10,18 +10,23 @@ import javax.naming.*;
 public class Irc {
     private final String TopicName = "MonTopic";
 
-    private Frame     mainFrame;
-    private Button    writeButton;
-    private TextArea  text;  // area where messages are displayed to the user.
-    private TextField input; // input field where the user types.
+    private static Frame     mainFrame;
+    private static Button    writeButton;
+    private static TextArea  text;  // area where messages are displayed to the user.
+    private static TextField input; // input field where the user types.
+    private static TextField private_input;
 
-    public String myName; // username (got from command line)
+    public static String myName; // username (got from command line)
+    
+
+    public static ArrayList<String> utilisateurs = new ArrayList<String>();
 
     public Connection        connection;
-    public Session           sessionC;
-    public Session           sessionP;
-    public MessageProducer   producer;
-    public MessageConsumer   consumer;
+    public  Session           sessionC;
+    public static Session           sessionP;
+    public static MessageProducer   producer;
+    public  MessageConsumer   consumer;
+    public MessageConsumer myConsumer;
 
     public static void main(String argv[]) {
         if (argv.length != 1) {
@@ -29,6 +34,14 @@ public class Irc {
             return;
         }
         new Irc(argv[0]);
+    }
+    
+    public static boolean contains(String str, String src){
+        //Check in str if src is present
+        //If yes, return the string after src
+        //If no, return null
+        int index = str.indexOf(src);
+        return index != -1;
     }
 
     private Irc(String name) {
@@ -45,7 +58,10 @@ public class Irc {
 
         input = new TextField(60);
         frame.add(input);
-
+        
+        private_input = new TextField(5);
+        frame.add(private_input);
+        
         Panel buttons = new Panel();
         buttons.setLayout(new FlowLayout());
 
@@ -66,6 +82,10 @@ public class Irc {
         Button leave_button = new Button("leave");
         leave_button.addActionListener(new LeaveListener());
         buttons.add(leave_button);
+        
+        Button private_message = new Button("private");
+        private_message.addActionListener(new PrivateListener());
+        buttons.add(private_message);
 
         frame.add(buttons, BorderLayout.SOUTH);
 
@@ -76,14 +96,48 @@ public class Irc {
     }
 
     /* allow to print something in the window */
-    public void print(String msg) {
-        text.append(msg+"\n");
+    public static void print(String msg) {
+        try {
+			text.append(msg+"\n");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 
     private class ReadListener implements MessageListener {
         public void onMessage(Message msg)  {
             try {
-                // XXXX
+               StreamMessage sm_msg  = (StreamMessage) msg;
+               String _msg = sm_msg.readString();
+               System.out.println(_msg);
+
+               if(_msg.startsWith("say")){
+                Irc.print(_msg);
+               } else if (_msg.startsWith("enter")){
+                StreamMessage iamhere_msg = Irc.sessionP.createStreamMessage();
+
+                iamhere_msg.writeString("iamhere "+Irc.myName);
+                
+                Irc.producer.send(iamhere_msg);
+               } else if (_msg.startsWith("iamhere")){
+                
+                if (!Irc.utilisateurs.contains(_msg)) {
+                	Irc.print("Arrivée de "+_msg);
+                    Irc.utilisateurs.add(_msg);
+                }
+               } else if (_msg.startsWith("leave")){
+                Irc.print("**** Bye from: " + _msg);
+                Irc.utilisateurs.remove(_msg);
+               } else if (_msg.startsWith("private_say")){
+                    if (contains(_msg,Irc.myName)) {
+                        Irc.print(_msg);
+                    }
+               }
+               else {
+                Irc.print("Pas compris");
+               }
+
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -95,7 +149,10 @@ public class Irc {
         public void actionPerformed (ActionEvent ae) {
             System.out.println("write button pressed");
             try {
-                // XXXX
+            	StreamMessage m = Irc.sessionP.createStreamMessage();
+    			m.writeString("say :"+Irc.myName+" says "+Irc.input.getText());
+    			Irc.producer.send(m);
+    			Irc.input.setText("");
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -106,11 +163,18 @@ public class Irc {
     private class ConnectListener implements ActionListener {
         public void actionPerformed (ActionEvent ae) {
             try {
+            	System.out.println(Irc.myName);
                 ((Button) ae.getSource()).setEnabled(false);
                 InitialContext ic = new InitialContext ();
 
                 ConnectionFactory connectionFactory = (ConnectionFactory)ic.lookup("ConnFactory");
                 Destination destination = (Destination)ic.lookup(TopicName);
+                Destination me = (Destination)ic.lookup(Irc.myName);
+                
+                // Destination user1 = (Destination)ic.lookup("user1");
+                // Destination user2 = (Destination)ic.lookup("user2");
+                // Destination user3 = (Destination)ic.lookup("user3");
+                
 
                 System.out.println("Bound to ConnFactory and MonTopic");
 
@@ -118,25 +182,33 @@ public class Irc {
                 connection.start();
 
                 System.out.println("Created connection");
-
+                
                 System.out.println("Creating sessions: not transacted, auto ack");
                 Session sessionP = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
                 Session sessionC = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 
                 MessageProducer producer = sessionP.createProducer(destination);
+                
                 MessageConsumer consumer = sessionC.createConsumer(destination);
-
+                MessageConsumer meConsumer = sessionC.createConsumer(me);
+                
                 consumer.setMessageListener(new ReadListener());
+                //meConsumer.setMessageListener(new ReadListener());
 
                 Irc.this.connection = connection;
                 Irc.this.sessionC = sessionC;
-                Irc.this.sessionP = sessionP;
-                Irc.this.producer = producer;
+                Irc.sessionP = sessionP;
+                Irc.producer = producer;
                 Irc.this.consumer = consumer;
+                //Irc.this.myConsumer = meConsumer;
 
                 System.out.println("Ready");
 
                 writeButton.setEnabled(true);
+                
+                StreamMessage m = Irc.sessionP.createStreamMessage();
+    			m.writeString("enter "+Irc.myName);
+    			Irc.producer.send(m);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -148,7 +220,14 @@ public class Irc {
         public void actionPerformed (ActionEvent ae) {
             System.out.println("who button pressed");
             try {
-                // XXXX
+            	try {
+        			String res = "";
+        			for (String e : Irc.utilisateurs)
+        				res += " "+e;
+        			Irc.print(res);
+        		} catch (Exception ex) {
+        			ex.printStackTrace();
+        		}
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -160,13 +239,35 @@ public class Irc {
         public void actionPerformed (ActionEvent ae) {
             System.out.println("leave button pressed");
             try {
-                // XXXX
+            	StreamMessage m = Irc.sessionP.createStreamMessage();
+    			m.writeString("leave "+Irc.myName);
+    			Irc.producer.send(m);
                 if (connection != null) connection.close();
                 mainFrame.dispose();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
+    }
+    
+    private class PrivateListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent ae) {
+			try {
+				StreamMessage m = Irc.sessionP.createStreamMessage();
+    			m.writeString("private_say "+Irc.input.getText()+" "+Irc.myName+" says "+Irc.input.getText() + "to "+private_input.getText());
+    			// /onC.createConsumer(destination);
+    			InitialContext ic = new InitialContext ();
+                Destination destination = (Destination)ic.lookup(Irc.private_input.getText());
+    			producer.send(m);
+    			Irc.input.setText("");
+			} catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			
+		}
+    	
     }
 
 }
